@@ -14,6 +14,7 @@ public class Buttons extends JFrame{
     JButton[] buttons = new JButton[RAND_RANGE_BTN+1];
     Random myrand = new Random();
 
+    //MUROK jebem ti mater
 
     public Buttons(JPanel buttonsPanel) {
         this.setLayout(new GridLayout(4,4));
