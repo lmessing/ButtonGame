@@ -18,7 +18,7 @@ public class GUI extends JFrame {
     Random myrand = new Random();
     private JTextArea messageTextArea = new JTextArea();
     private JLabel timeLabel = new JLabel("tswtet");
-
+    Client GameClient;
 
     public GUI(String title) {
         super(title);
@@ -27,7 +27,7 @@ public class GUI extends JFrame {
       //  Random random = new Random();
       //  int value = random.nextInt(2) + 5;
 
-        ChatClient chatClient = new ChatClient("localhost", 1234);
+        GameClient = new Client("localhost", 1234);
 
         bottomButton.setEnabled(false);
         this.setLayout(new BorderLayout());
@@ -54,7 +54,7 @@ public class GUI extends JFrame {
                         timer.start();
 
                         bottomButton.setEnabled(true);
-                        chatClient.start();
+                        GameClient.start();
 
                         try {
                             Thread.sleep(1000);
@@ -83,7 +83,7 @@ public class GUI extends JFrame {
             }
         };
 
-        chatClient.addActionListener(receiveListener);
+        GameClient.addActionListener(receiveListener);
 
 
 
@@ -148,9 +148,9 @@ public class GUI extends JFrame {
                 while (!hasWorked) {
                     if (buttons[id].isEnabled()) {
                         id = myrand.nextInt(RAND_RANGE_BTN);
-                        buttons[id].setEnabled(true);
                     } else {
                         buttons[id].setEnabled(true);
+                        GameClient.sendMessage(String.valueOf(id));
                         buttons[id].setBackground(Color.GREEN);
                         hasWorked = true;
                     }

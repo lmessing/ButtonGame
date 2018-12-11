@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class GUIChatClient extends JFrame {
-    ChatClient chatClient;
+    Client chatClient;
     private JTextArea messageTextArea = new JTextArea();
     private JTextField sendArea = new JTextField();
     private JButton sendButton = new JButton("Send");
@@ -22,7 +22,7 @@ public class GUIChatClient extends JFrame {
 
         messageTextArea.setEditable(false);
 
-        chatClient = new ChatClient("localhost", 1234);
+        chatClient = new Client("localhost", 1234);
 
 
         ActionListener sendListener = new ActionListener() {

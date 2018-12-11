@@ -5,15 +5,15 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class ChatClient {
+public class Client {
 
     private String host;
     private int port;
-    private ChatConnection connection;
+    private Connection connection;
     private ArrayList<ActionListener> listeners = new ArrayList<>();
 
 
-    public ChatClient(String host, int port) {
+    public Client(String host, int port) {
         this.host = host;
         this.port = port;
     }
@@ -21,7 +21,7 @@ public class ChatClient {
     public void start() {
 
         try {
-            connection = new ChatConnection(new Socket(host, port));
+            connection = new Connection(new Socket(host, port));
 
             for(ActionListener listener : listeners) {
                 connection.addMessageListener(listener);
@@ -59,7 +59,7 @@ public class ChatClient {
     public static void main(String[] args) {
         // create a new instance of out ChatClient Object
         // We need to define the host and port our server is running
-        ChatClient client = new ChatClient("localhost", 1234);
+        Client client = new Client("localhost", 1234);
 
         client.addActionListener(new ActionListener() {
             @Override
