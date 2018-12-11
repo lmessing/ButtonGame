@@ -14,7 +14,8 @@ public class GUI extends JFrame {
     private static final int RAND_RANGE_FOR = 3;
     private int i = 0;
     private int randTime = 0;
-    Timer timer;
+    Timer delayTimer;
+    long buttonStartTime, buttonStopTime;
     JButton[] buttons = new JButton[RAND_RANGE_BTN + 1];
     Random myrand = new Random();
     private JTextArea messageTextArea = new JTextArea();
@@ -25,7 +26,7 @@ public class GUI extends JFrame {
 
     public GUI(String title) {
         super(title);
-        this.setSize(400, 400);
+        this.setSize(600, 600);
         this.setLayout(new BorderLayout());
 
         GameClient = new Client("localhost", 1234);
@@ -54,18 +55,16 @@ public class GUI extends JFrame {
                         bottomButton.setEnabled(true);
 
 
-                        timer = new Timer((RAND_RANGE_TIME + 3000), TimerListener);
-                        timer.start();
+                        delayTimer = new Timer((RAND_RANGE_TIME + 3000), DelayTimerListener);
+                        delayTimer.start();
 
                         bottomButton.setEnabled(true);
                         GameClient.start();
-                       // chatClient.start();
 
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {
                         }
-
                     }
                 }.start();
             }
@@ -77,7 +76,8 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent actionEvent) {
                 bottomButton.setEnabled(false);
                 topButton.setEnabled(true);
-                timer.stop();
+                timeLabel.setText("");
+                delayTimer.stop();
             }
         });
 
@@ -89,8 +89,6 @@ public class GUI extends JFrame {
         };
 
         GameClient.addActionListener(receiveListener);
-
-
 
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.setVisible(true);
@@ -114,11 +112,16 @@ public class GUI extends JFrame {
                         button.setBackground(Color.GRAY);
                     }
                     if (checkButtons()) {
-                        float time = timer.getDelay() / 1000;
-                        timeLabel.setText(String.valueOf(time));
+                        buttonStopTime = System.currentTimeMillis();
+
+                        long elapsedTime = (buttonStopTime - buttonStartTime);
+
+
+                        timeLabel.setText(String.valueOf(elapsedTime) + " ms");
+
                         randTime = myrand.nextInt(RAND_RANGE_TIME +3000);
-                        timer = new Timer(randTime, TimerListener);
-                        timer.restart();
+                        delayTimer = new Timer(randTime, DelayTimerListener);
+                        delayTimer.restart();
                     }
                 }
             });
@@ -142,10 +145,11 @@ public class GUI extends JFrame {
         return (status);
     }
 
-    public ActionListener TimerListener = new ActionListener() {
+    public ActionListener DelayTimerListener = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent ae) {
-            timer.stop();
+            delayTimer.stop();
+            buttonStartTime = System.currentTimeMillis();
             int rand_for = myrand.nextInt(RAND_RANGE_FOR);
 
             for (int i = 0; i <= rand_for; i++) {
