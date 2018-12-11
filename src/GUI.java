@@ -16,6 +16,8 @@ public class GUI extends JFrame {
     Timer timer;
     JButton[] buttons = new JButton[RAND_RANGE_BTN + 1];
     Random myrand = new Random();
+    private JTextArea messageTextArea = new JTextArea();
+    private JLabel timeLabel = new JLabel("tswtet");
 
 
     public GUI(String title) {
@@ -25,12 +27,17 @@ public class GUI extends JFrame {
       //  Random random = new Random();
       //  int value = random.nextInt(2) + 5;
 
+        ChatClient chatClient = new ChatClient("localhost", 1234);
+
         bottomButton.setEnabled(false);
         this.setLayout(new BorderLayout());
         this.add(topButton, BorderLayout.NORTH);
         this.add(bottomButton,BorderLayout.SOUTH);
+        this.add(timeLabel, BorderLayout.EAST);
 
         JPanel buttonsPanel = new JPanel();
+        JPanel labelPanel = new JPanel();
+
         addButtons(buttonsPanel);
         this.add(buttonsPanel, BorderLayout.CENTER);
 
@@ -47,6 +54,7 @@ public class GUI extends JFrame {
                         timer.start();
 
                         bottomButton.setEnabled(true);
+                        chatClient.start();
 
                         try {
                             Thread.sleep(1000);
@@ -68,6 +76,16 @@ public class GUI extends JFrame {
                 timer.stop();
             }
         });
+        ActionListener receiveListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                messageTextArea.append(actionEvent.getActionCommand() + "\n");
+            }
+        };
+
+        chatClient.addActionListener(receiveListener);
+
+
 
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.setVisible(true);
@@ -98,8 +116,7 @@ public class GUI extends JFrame {
             i++;
         }
 
-        //timer = new Timer(myrand.nextInt(RAND_RANGE_TIME+3000), TimerListener);
-        // timer.start();
+
     }
 
     public boolean checkButtons() {
@@ -141,5 +158,4 @@ public class GUI extends JFrame {
             }
         }
     };
-
 }
