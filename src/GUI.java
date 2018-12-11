@@ -13,33 +13,34 @@ public class GUI extends JFrame {
     private static final int RAND_RANGE_BTN = 15;
     private static final int RAND_RANGE_FOR = 3;
     private int i = 0;
+    private int randTime = 0;
     Timer timer;
     JButton[] buttons = new JButton[RAND_RANGE_BTN + 1];
     Random myrand = new Random();
     private JTextArea messageTextArea = new JTextArea();
-    private JLabel timeLabel = new JLabel("tswtet");
+    private JLabel timeLabel = new JLabel();
+    JPanel buttonsPanel = new JPanel();
 
 
     public GUI(String title) {
         super(title);
         this.setSize(400, 400);
-
-      //  Random random = new Random();
-      //  int value = random.nextInt(2) + 5;
+        this.setLayout(new BorderLayout());
 
         ChatClient chatClient = new ChatClient("localhost", 1234);
 
         bottomButton.setEnabled(false);
-        this.setLayout(new BorderLayout());
-        this.add(topButton, BorderLayout.NORTH);
-        this.add(bottomButton,BorderLayout.SOUTH);
-        this.add(timeLabel, BorderLayout.EAST);
-
-        JPanel buttonsPanel = new JPanel();
-        JPanel labelPanel = new JPanel();
 
         addButtons(buttonsPanel);
+        JPanel bottomPanel = new JPanel(new GridLayout(2,1));
+        bottomPanel.add(bottomButton);
+        bottomPanel.add(timeLabel);
+
+        this.add(topButton, BorderLayout.NORTH);
+        this.add(bottomPanel, BorderLayout.SOUTH);
         this.add(buttonsPanel, BorderLayout.CENTER);
+
+
 
         topButton.addActionListener(new ActionListener() {
             @Override
@@ -50,11 +51,13 @@ public class GUI extends JFrame {
 
                         topButton.setEnabled(false);
                         bottomButton.setEnabled(true);
-                        timer = new Timer(myrand.nextInt(RAND_RANGE_TIME + 3000), TimerListener);
+
+
+                        timer = new Timer((RAND_RANGE_TIME + 3000), TimerListener);
                         timer.start();
 
                         bottomButton.setEnabled(true);
-                        chatClient.start();
+                       // chatClient.start();
 
                         try {
                             Thread.sleep(1000);
@@ -66,7 +69,6 @@ public class GUI extends JFrame {
             }
         });
 
-        this.add(buttonsPanel, BorderLayout.CENTER);
 
         bottomButton.addActionListener(new ActionListener() {
             @Override
@@ -76,6 +78,7 @@ public class GUI extends JFrame {
                 timer.stop();
             }
         });
+
         ActionListener receiveListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -97,6 +100,9 @@ public class GUI extends JFrame {
         for (JButton button : buttons) {
             buttons[i] = new JButton();
             buttonsPanel.add(buttons[i]);
+            buttons[i].setBackground(Color.GRAY);
+            buttons[i].setEnabled(false);
+
             buttons[i].addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -106,17 +112,17 @@ public class GUI extends JFrame {
                         button.setBackground(Color.GRAY);
                     }
                     if (checkButtons()) {
-                        timer = new Timer(myrand.nextInt(RAND_RANGE_TIME + 3000), TimerListener);
+                        float time = timer.getDelay() / 1000;
+                        timeLabel.setText(String.valueOf(time));
+                        randTime = myrand.nextInt(RAND_RANGE_TIME +3000);
+                        timer = new Timer(randTime, TimerListener);
                         timer.restart();
                     }
                 }
             });
-            buttons[i].setBackground(Color.GRAY);
-            buttons[i].setEnabled(false);
+
             i++;
         }
-
-
     }
 
     public boolean checkButtons() {
