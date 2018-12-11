@@ -21,13 +21,14 @@ public class GUI extends JFrame {
     private JLabel timeLabel = new JLabel();
     JPanel buttonsPanel = new JPanel();
 
+    Client GameClient;
 
     public GUI(String title) {
         super(title);
         this.setSize(400, 400);
         this.setLayout(new BorderLayout());
 
-        ChatClient chatClient = new ChatClient("localhost", 1234);
+        GameClient = new Client("localhost", 1234);
 
         bottomButton.setEnabled(false);
 
@@ -57,6 +58,7 @@ public class GUI extends JFrame {
                         timer.start();
 
                         bottomButton.setEnabled(true);
+                        GameClient.start();
                        // chatClient.start();
 
                         try {
@@ -86,7 +88,7 @@ public class GUI extends JFrame {
             }
         };
 
-        chatClient.addActionListener(receiveListener);
+        GameClient.addActionListener(receiveListener);
 
 
 
@@ -154,9 +156,9 @@ public class GUI extends JFrame {
                 while (!hasWorked) {
                     if (buttons[id].isEnabled()) {
                         id = myrand.nextInt(RAND_RANGE_BTN);
-                        buttons[id].setEnabled(true);
                     } else {
                         buttons[id].setEnabled(true);
+                        GameClient.sendMessage(String.valueOf(id));
                         buttons[id].setBackground(Color.GREEN);
                         hasWorked = true;
                     }

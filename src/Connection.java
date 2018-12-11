@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class ChatConnection {
+public class Connection {
     // Connection object (Server -> Client or Client -> Server)
     private Socket socket;
 
@@ -22,7 +22,7 @@ public class ChatConnection {
 
     private boolean running = false;
 
-    public ChatConnection(Socket connection) {
+    public Connection(Socket connection) {
         socket = connection;
 
         try {
@@ -30,8 +30,8 @@ public class ChatConnection {
             receive = new DataInputStream(socket.getInputStream());
             send = new DataOutputStream(socket.getOutputStream());
         } catch (Exception e) {
-            ChatConnection.this.stop();
-            ChatConnection.this.close();
+            Connection.this.stop();
+            Connection.this.close();
         }
     }
 
@@ -62,8 +62,8 @@ public class ChatConnection {
                             notifyListeners(message);
                         }
                     } catch (IOException e) {
-                        ChatConnection.this.stop();
-                        ChatConnection.this.close();
+                        Connection.this.stop();
+                        Connection.this.close();
                     }
                 }
                 // at this point the running variable is false
@@ -113,8 +113,8 @@ public class ChatConnection {
             send.writeUTF(message);
             send.flush();
         } catch (IOException e) {
-            ChatConnection.this.stop();
-            ChatConnection.this.close();
+            Connection.this.stop();
+            Connection.this.close();
         }
     }
 

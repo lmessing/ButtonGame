@@ -4,24 +4,24 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 
-public class ChatServer {
+public class Server {
     private int port;
-    private ArrayList<ChatConnection> connections = new ArrayList<>();
+    private ArrayList<Connection> connections = new ArrayList<>();
     private ArrayList<ActionListener> listeners = new ArrayList<>();
 
     private ActionListener broadcastListener = new ActionListener() {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            for (ChatConnection c : connections) {
-                c.sendMessage(((ChatConnection) e.getSource()).getUsername() + ": " + e.getActionCommand());
+            for (Connection c : connections) {
+                c.sendMessage(((Connection) e.getSource()).getUsername() + ": " + e.getActionCommand());
             }
         }
     };
 
     private boolean running = false;
 
-    public ChatServer(int port) {
+    public Server(int port) {
         this.port = port;
     }
 
@@ -41,14 +41,14 @@ public class ChatServer {
             public void run() {
                 // try with resources
                 // Class MUST implement java.io.
-                try (ServerSocket server = new ServerSocket(ChatServer.this.port)) {
+                try (ServerSocket server = new ServerSocket(Server.this.port)) {
 
                     // loop for managing our incoming connections
                     while (running) {
                         // server.accept() gives us a socket object
                         // this socket object is used to "talk" with the client
                         // wrap ChatConnection object around this incoming socket object
-                        ChatConnection conn = new ChatConnection(server.accept());
+                        Connection conn = new Connection(server.accept());
 
                         // Messagelisteners listen to incoming messages
                         // --> messages from the client to the server
@@ -88,7 +88,7 @@ public class ChatServer {
                     while (connections.size() > 0) {
                         // remove all existing connections from the list
                         // take the first element from the list
-                        ChatConnection c = connections.get(0);
+                        Connection c = connections.get(0);
 
                         // and remove it
                         connections.remove(c);
@@ -106,7 +106,7 @@ public class ChatServer {
         }.start();
     }
 
-    public ArrayList<ChatConnection> getConnections() {
+    public ArrayList<Connection> getConnections() {
         return connections;
     }
 
@@ -130,15 +130,15 @@ public class ChatServer {
     public static void main(String[] args) {
         // create a new instance of out ChatServer Object
         // We need to define the port out server is running
-        ChatServer server = new ChatServer(1234);
+        Server server = new Server(1234);
 
         ActionListener l = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 if (actionEvent.getActionCommand().equalsIgnoreCase("EXIT")) {
-                    ArrayList<ChatConnection> list = server.getConnections();
+                    ArrayList<Connection> list = server.getConnections();
 
-                    for (ChatConnection chatConnection : list) {
+                    for (Connection chatConnection : list) {
                         if (actionEvent.getSource().equals(chatConnection)) {
                             list.remove(chatConnection);
 
