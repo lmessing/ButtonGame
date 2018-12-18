@@ -55,12 +55,9 @@ public class Connection {
                         // Receive messages from the other side
                         String message = receive.readUTF();
 
-                        if (username.length() <= 0) {
-                            username = message;
-                        } else {
                             // Send message to all Listeners
                             notifyListeners(message);
-                        }
+
                     } catch (IOException e) {
                         Connection.this.stop();
                         Connection.this.close();

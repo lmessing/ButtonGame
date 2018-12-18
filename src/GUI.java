@@ -54,7 +54,7 @@ public class GUI extends JFrame {
                         topButton.setEnabled(false);
                         bottomButton.setEnabled(true);
 
-
+                        // GET RAND
                         delayTimer = new Timer((RAND_RANGE_TIME + 3000), DelayTimerListener);
                         delayTimer.start();
 
@@ -118,7 +118,7 @@ public class GUI extends JFrame {
 
 
                         timeLabel.setText(String.valueOf(elapsedTime) + " ms");
-
+                        //GET RAND
                         randTime = myrand.nextInt(RAND_RANGE_TIME +3000);
                         delayTimer = new Timer(randTime, DelayTimerListener);
                         delayTimer.restart();
@@ -150,19 +150,25 @@ public class GUI extends JFrame {
         public void actionPerformed(ActionEvent ae) {
             delayTimer.stop();
             buttonStartTime = System.currentTimeMillis();
+
+            //GET RAND
             int rand_for = myrand.nextInt(RAND_RANGE_FOR);
 
             for (int i = 0; i <= rand_for; i++) {
 
+                //GET RAND
                 int id = myrand.nextInt(RAND_RANGE_BTN);
                 boolean hasWorked = false;
 
                 while (!hasWorked) {
                     if (buttons[id].isEnabled()) {
+
+
+                        //GET RAND
                         id = myrand.nextInt(RAND_RANGE_BTN);
                     } else {
                         buttons[id].setEnabled(true);
-                        GameClient.sendMessage(String.valueOf(id));
+                        //GameClient.sendMessage(String.valueOf(id));
                         buttons[id].setBackground(Color.GREEN);
                         hasWorked = true;
                     }

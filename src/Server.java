@@ -1,10 +1,22 @@
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Server {
+
+    private static final int RAND_RANGE_TIME = 3000;
+    private static final int RAND_RANGE_BTN = 15;
+    private static final int RAND_RANGE_FOR = 3;
+
+    private boolean started = false;
+    private Random myrand = new Random();
+
+    long buttonStartTime, buttonStopTime;
+
     private int port;
     private ArrayList<Connection> connections = new ArrayList<>();
     private ArrayList<ActionListener> listeners = new ArrayList<>();
@@ -13,11 +25,36 @@ public class Server {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            for (Connection c : connections) {
-                c.sendMessage(((Connection) e.getSource()).getUsername() + ": " + e.getActionCommand());
+
+            switch (e.getActionCommand()){
+                case "start": delayTimer.start();
+                break;
+                case "done":
+                    buttonStopTime = System.currentTimeMillis();
+                    long elapsedTime = (buttonStopTime - buttonStartTime);
+                    Connection c = (Connection)e.getSource();
+                    c.sendMessage(Long.toString(elapsedTime));
+                    break;
             }
+
         }
     };
+
+
+    public Timer delayTimer = new Timer(myrand.nextInt(RAND_RANGE_TIME) + 3000, new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            delayTimer.stop();
+            delayTimer.setDelay(myrand.nextInt(RAND_RANGE_TIME) + 3000);
+            for (Connection c : connections) {
+                for (int i = 0; i <= myrand.nextInt(RAND_RANGE_FOR); i++) {
+                    c.sendMessage(Integer.toString(myrand.nextInt(RAND_RANGE_BTN)));
+                }
+            }
+            buttonStartTime = System.currentTimeMillis();
+        }
+    });
+
 
     private boolean running = false;
 

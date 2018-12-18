@@ -11,6 +11,7 @@ public class Client {
     private int port;
     private Connection connection;
     private ArrayList<ActionListener> listeners = new ArrayList<>();
+    private String Message = null;
 
 
     public Client(String host, int port) {
@@ -43,6 +44,10 @@ public class Client {
         listeners.add(listener);
     }
 
+    public String getMessage(){
+        return(Message);
+    }
+
     public void stop() {
 
         if (connection != null) {
@@ -55,8 +60,9 @@ public class Client {
         connection.sendMessage(message);
     }
 
-
     public static void main(String[] args) {
+
+
         // create a new instance of out ChatClient Object
         // We need to define the host and port our server is running
         Client client = new Client("localhost", 1234);
@@ -64,6 +70,7 @@ public class Client {
         client.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 System.out.println(e.getActionCommand());
             }
         });
