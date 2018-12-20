@@ -1,5 +1,4 @@
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,7 +18,7 @@ public class GUIChatClient extends JFrame {
     private JTextField sendArea = new JTextField();
     private JButton buttonSend = new JButton("Send");
     private boolean started = false;
-    private String Message;
+    private String message;
     Client client;
     //private Timer delayTimer;
 
@@ -96,18 +95,22 @@ public class GUIChatClient extends JFrame {
         ActionListener receiveListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                Message = actionEvent.getActionCommand();
-                System.out.println("Neue Nachricht empfangen: " + actionEvent.getActionCommand());
-                messageTextArea.append(actionEvent.getActionCommand() + "\n");
-                if (Integer.parseInt(actionEvent.getActionCommand()) > 16) {
-                    timeLabel.setText(actionEvent.getActionCommand()+"ms");
-                } else {
-                    if (!buttons[Integer.parseInt(actionEvent.getActionCommand())].isEnabled()) {
-                        buttons[Integer.parseInt(actionEvent.getActionCommand())].setEnabled(true);
-                        buttons[Integer.parseInt(actionEvent.getActionCommand())].setBackground(Color.GREEN);
+                message = actionEvent.getActionCommand();
+
+                if(actionEvent.getID() == 1) {
+                    int selectedButton = Integer.parseInt(message);
+
+                    if (!buttons[selectedButton].isEnabled()) {
+                        buttons[selectedButton].setEnabled(true);
+                        buttons[selectedButton].setBackground(Color.GREEN);
                         buttonStart.setEnabled(false);
                     }
+                }
 
+                if(actionEvent.getID() == 0) {
+                    System.out.println("Neue Nachricht empfangen: " +message);
+                    timeLabel.setText("Deine Zeit: " +message + "ms\n");
+                    messageTextArea.append(message + "ms\n");
                 }
             }
         };
