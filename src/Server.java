@@ -41,6 +41,7 @@ public class Server {
                         if(running = false) {
                             start();
                         }
+
                         temp2++;
 
                         if(temp2 >= connections.size()){
@@ -60,8 +61,8 @@ public class Server {
                             Connection connection = c.next();
                             String username = connection.getUsername();
                             //connection.sendMessage(username + elapsedTime);
-                            connection.sendMessage("192.168.97.26" + elapsedTime);
-
+                            connection.sendMessage(username);
+                            connection.sendMessage(Long.toString(elapsedTime));
                         }
 
                         if(temp < connections.size()){

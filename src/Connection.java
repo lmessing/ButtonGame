@@ -55,25 +55,20 @@ public class Connection {
                         // Receive messages from the other side
                         String message = receive.readUTF();
 
-                        /* if (username.length() <= 0) {
+                         if (username.length() <= 0) {
                             username = message;
                         } else {
-                            // Send message to all Listeners
-                            notifyListeners(message);
-                        }*/
+                             if(message.equals("start") || message.equals("done")) {
+                                 sendServerCommand(message);
+                             }
 
-                        if(message.equals("start") || message.equals("done")) {
-                            sendServerCommand(message);
-                        }
+                             else if (between(Integer.parseInt(message),0,15) == true) {
+                                 sendSelected(message);
+                             }
 
-                        else if (between(Integer.parseInt(message),0,15) == true) {
-                            sendSelected(message);
-                        } else if(message.charAt(3)=='.'){
-                            sendIP(message);
-                        }
-
-                        else{
-                            sendTime(message);
+                             else {
+                                 sendTime(message);
+                             }
                         }
 
                         // notifyListeners(message);

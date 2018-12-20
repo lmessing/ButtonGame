@@ -15,15 +15,17 @@ import java.util.Hashtable;
 public class GUIChatClient extends JFrame {
 
 
-    private JTextArea messageTextArea = new JTextArea(1, 15);
-    private JLabel timeLabel = new JLabel();
+    private JTextArea messageTextArea = new JTextArea(1,15);
+    private JLabel timeLabel = new JLabel("Ihre Zeit:");
     JButton[] buttons = new JButton[16];
     JPanel buttonPanel = new JPanel();
     JButton buttonStart = new JButton("Start");
     JPanel southPanel = new JPanel(new BorderLayout());
+    JPanel topPanel = new JPanel(new BorderLayout());
     JPanel timePanel = new JPanel(new BorderLayout());
-    JPanel mainPanel = new JPanel(new GridLayout(1, 2));
-    JPanel userPanel = new JPanel(new FlowLayout());
+    JPanel mainPanel = new JPanel(new GridLayout(1,2));
+    JLabel ipLabel = new JLabel("IP Adresse eingeben: ");
+    JTextField ipAddressField = new JTextField();
     private boolean started = false;
     private String ip;
     private String message;
@@ -35,10 +37,10 @@ public class GUIChatClient extends JFrame {
         setTitle("GUI Chat");
         setSize(600, 400);
 
-
-        southPanel.add(buttonStart, BorderLayout.EAST);
-        //  southPanel.add(messageTextArea, BorderLayout.CENTER);
-        southPanel.add(timeLabel, BorderLayout.WEST);
+        southPanel.add(buttonStart,BorderLayout.EAST);
+        southPanel.add(timeLabel,BorderLayout.WEST);
+        topPanel.add(ipLabel,BorderLayout.WEST);
+        topPanel.add(ipAddressField,BorderLayout.CENTER);
 
         mainPanel.add(buttonPanel);
         mainPanel.add(timePanel);
@@ -46,11 +48,12 @@ public class GUIChatClient extends JFrame {
         timePanel.add(new JScrollPane(messageTextArea), BorderLayout.CENTER);
 
         this.add(mainPanel, BorderLayout.CENTER);
-        this.add(southPanel, BorderLayout.SOUTH);
+        this.add(southPanel,BorderLayout.SOUTH);
         this.add(timePanel, BorderLayout.EAST);
+        this.add(topPanel, BorderLayout.NORTH);
 
         messageTextArea.setEditable(false);
-
+        buttonStart.setEnabled(false);
         buttonPanel.setLayout(new GridLayout(4, 4));
 
         try (final DatagramSocket socket = new DatagramSocket()) {
@@ -73,6 +76,7 @@ public class GUIChatClient extends JFrame {
                     button.setBackground(Color.GRAY);
                 }
                 if (checkButtons()) {
+                    buttonStart.setEnabled(true);
                     started = false;
                     client.sendMessage("done");
                 }
@@ -138,6 +142,15 @@ public class GUIChatClient extends JFrame {
 
         };
 
+        ipAddressField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                client.sendMessage(getIpAddress());
+                ipAddressField.setText("");
+                buttonStart.setEnabled(true);
+
+            }
+        });
         client.addActionListener(receiveListener);
         client.start();
         setVisible(true);
@@ -158,6 +171,9 @@ public class GUIChatClient extends JFrame {
         return (status);
     }
 
+    private String getIpAddress(){
+        return ipAddressField.getText();
+    }
 
     public static void main(String[] args) {
         GUIChatClient guiChatClient = new GUIChatClient();
