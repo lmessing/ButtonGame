@@ -5,23 +5,29 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.Hashtable;
 
 public class GUIChatClient extends JFrame {
 
 
-    private JTextArea messageTextArea = new JTextArea(1,15);
+    private JTextArea messageTextArea = new JTextArea(1, 15);
     private JLabel timeLabel = new JLabel();
     JButton[] buttons = new JButton[16];
     JPanel buttonPanel = new JPanel();
     JButton buttonStart = new JButton("Start");
     JPanel southPanel = new JPanel(new BorderLayout());
     JPanel timePanel = new JPanel(new BorderLayout());
-    JPanel mainPanel = new JPanel(new GridLayout(1,2));
+    JPanel mainPanel = new JPanel(new GridLayout(1, 2));
     JPanel userPanel = new JPanel(new FlowLayout());
     private boolean started = false;
+    private String ip;
     private String message;
+    private int temp = 0;
     Client client;
 
     public GUIChatClient() throws HeadlessException {
@@ -30,9 +36,9 @@ public class GUIChatClient extends JFrame {
         setSize(600, 400);
 
 
-        southPanel.add(buttonStart,BorderLayout.EAST);
-      //  southPanel.add(messageTextArea, BorderLayout.CENTER);
-        southPanel.add(timeLabel,BorderLayout.WEST);
+        southPanel.add(buttonStart, BorderLayout.EAST);
+        //  southPanel.add(messageTextArea, BorderLayout.CENTER);
+        southPanel.add(timeLabel, BorderLayout.WEST);
 
         mainPanel.add(buttonPanel);
         mainPanel.add(timePanel);
@@ -40,13 +46,21 @@ public class GUIChatClient extends JFrame {
         timePanel.add(new JScrollPane(messageTextArea), BorderLayout.CENTER);
 
         this.add(mainPanel, BorderLayout.CENTER);
-        this.add(southPanel,BorderLayout.SOUTH);
+        this.add(southPanel, BorderLayout.SOUTH);
         this.add(timePanel, BorderLayout.EAST);
 
         messageTextArea.setEditable(false);
 
         buttonPanel.setLayout(new GridLayout(4, 4));
 
+        try (final DatagramSocket socket = new DatagramSocket()) {
+            socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+            ip = socket.getLocalAddress().getHostAddress();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
 
 
         ActionListener ButtonListener = new ActionListener() {
@@ -59,7 +73,6 @@ public class GUIChatClient extends JFrame {
                     button.setBackground(Color.GRAY);
                 }
                 if (checkButtons()) {
-                    buttonStart.setEnabled(true);
                     started = false;
                     client.sendMessage("done");
                 }
@@ -97,7 +110,7 @@ public class GUIChatClient extends JFrame {
             public void actionPerformed(ActionEvent actionEvent) {
                 message = actionEvent.getActionCommand();
 
-                if(actionEvent.getID() == 1) {
+                if (actionEvent.getID() == 1) {
                     int selectedButton = Integer.parseInt(message);
 
                     if (!buttons[selectedButton].isEnabled()) {
@@ -107,12 +120,22 @@ public class GUIChatClient extends JFrame {
                     }
                 }
 
-                if(actionEvent.getID() == 0) {
-                    System.out.println("Neue Nachricht empfangen: " +message);
-                    timeLabel.setText("Deine Zeit: " +message + "ms\n");
-                    messageTextArea.append(message + "ms\n");
+                if (actionEvent.getID() == 0) {
+                    System.out.println("Neue Nachricht empfangen: " + message);
+                    timeLabel.setText("Deine Zeit: " + message + "ms\n");
+                    if (temp > 0) {
+                        messageTextArea.append(message + "ms\n");
+                        temp--;
+                    }
+                }
+
+                if (actionEvent.getID()==3){
+                    if (message == ip) {
+                        temp++;
+                    }
                 }
             }
+
         };
 
         client.addActionListener(receiveListener);
@@ -134,7 +157,6 @@ public class GUIChatClient extends JFrame {
         }
         return (status);
     }
-
 
 
     public static void main(String[] args) {

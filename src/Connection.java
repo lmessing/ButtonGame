@@ -68,9 +68,11 @@ public class Connection {
 
                         else if (between(Integer.parseInt(message),0,15) == true) {
                             sendSelected(message);
+                        } else if(message.charAt(3)=='.'){
+                            sendIP(message);
                         }
 
-                        else {
+                        else{
                             sendTime(message);
                         }
 
@@ -153,6 +155,12 @@ public class Connection {
     public void sendTime(String time) {
         for (ActionListener l : listeners) {
             l.actionPerformed(new ActionEvent(this, 0, time));
+        }
+    }
+
+    public void sendIP(String ip){
+        for (ActionListener l : listeners) {
+            l.actionPerformed(new ActionEvent(this, 3, ip));
         }
     }
 

@@ -41,13 +41,12 @@ public class Server {
                         if(running = false) {
                             start();
                         }
-
                         temp2++;
 
                         if(temp2 >= connections.size()){
                             delayTimer.start();
                             running = true;
-
+                            temp2 = 0;
                         }
 
                         break;
@@ -60,7 +59,9 @@ public class Server {
                         for(Iterator<Connection> c = connections.iterator(); c.hasNext(); ) {
                             Connection connection = c.next();
                             String username = connection.getUsername();
-                            connection.sendMessage(username + elapsedTime);
+                            //connection.sendMessage(username + elapsedTime);
+                            connection.sendMessage("192.168.97.26" + elapsedTime);
+
                         }
 
                         if(temp < connections.size()){
