@@ -16,7 +16,6 @@ public class Server {
     private Random myrand = new Random();
 
     long buttonStartTime, buttonStopTime;
-    private boolean running = false;
 
     private int port;
     private ArrayList<Connection> connections = new ArrayList<>();
@@ -28,10 +27,8 @@ public class Server {
         public void actionPerformed(ActionEvent e) {
 
             switch (e.getActionCommand()){
-                case "start":
-                    delayTimer.start();
-                    break;
-
+                case "start": delayTimer.start();
+                break;
                 case "done":
                     buttonStopTime = System.currentTimeMillis();
                     long elapsedTime = (buttonStopTime - buttonStartTime);
@@ -58,6 +55,8 @@ public class Server {
         }
     });
 
+
+    private boolean running = false;
 
     public Server(int port) {
         this.port = port;
