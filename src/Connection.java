@@ -55,20 +55,21 @@ public class Connection {
                         // Receive messages from the other side
                         String message = receive.readUTF();
 
-
-                        /*if (username.length() <= 0) {
+                        /* if (username.length() <= 0) {
                             username = message;
                         } else {
                             // Send message to all Listeners
                             notifyListeners(message);
                         }*/
-                        // Send message to all Listeners
+
                         if(message.equals("start") || message.equals("done")) {
                             sendServerCommand(message);
                         }
-                        else if (Integer.parseInt(message) >= 0 && Integer.parseInt(message) <=15 ) {
+
+                        else if (between(Integer.parseInt(message),0,15) == true) {
                             sendSelected(message);
                         }
+
                         else {
                             sendTime(message);
                         }
@@ -177,5 +178,12 @@ public class Connection {
 
     public String getUsername() {
         return username;
+    }
+
+    public static boolean between(int i, int minValueInclusive, int maxValueInclusive) {
+        if (i >= minValueInclusive && i <= maxValueInclusive)
+            return true;
+        else
+            return false;
     }
 }

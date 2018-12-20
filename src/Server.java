@@ -14,12 +14,11 @@ public class Server {
     private static final int RAND_RANGE_TIME = 3000;
     private static final int RAND_RANGE_BTN = 15;
     private static final int RAND_RANGE_FOR = 3;
-
-    private boolean started = false;
     private Random myrand = new Random();
-
     long buttonStartTime, buttonStopTime;
     private boolean running = false;
+    private int temp =1;
+    private int temp2 = 0;
 
     private int port;
     private ArrayList<Connection> connections = new ArrayList<>();
@@ -35,25 +34,53 @@ public class Server {
             }*/
 
             if(e.getID() == 2 ){
+
                 switch (e.getActionCommand()){
+
                     case "start":
-                        delayTimer.start();
+                        if(running = false) {
+                            start();
+                        }
+
+                        temp2++;
+
+                        if(temp2 >= connections.size()){
+                            delayTimer.start();
+                            running = true;
+
+                        }
+
                         break;
+
 
                     case "done":
                         buttonStopTime = System.currentTimeMillis();
                         long elapsedTime = (buttonStopTime - buttonStartTime);
-                        Connection c = (Connection)e.getSource();
-                        c.sendMessage(Long.toString(elapsedTime));
+
+                        for(Iterator<Connection> c = connections.iterator(); c.hasNext(); ) {
+                            Connection connection = c.next();
+                            String username = connection.getUsername();
+                            connection.sendMessage(username + elapsedTime);
+                        }
+
+                        if(temp < connections.size()){
+                            temp++;
+                        } else if(temp >= connections.size()){
+                            temp = 1;
+                            if(running = false) {
+                                start();
+                            }
+                            delayTimer.start();
+                            running = true;
+                        }
                         break;
                 }
             }
 
             if (e.getID() == 0) {
                 for (Connection c : connections) {
-                    c.sendMessage(((Connection) e.getSource()).getUsername() + ": " + e.getActionCommand());
+                    c.sendMessage(e.getActionCommand());
                 }
-
             }
 
         }
@@ -63,19 +90,13 @@ public class Server {
     public Timer delayTimer = new Timer(myrand.nextInt(RAND_RANGE_TIME) + 3000, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            //int[] selectedButtons = new int[2];
             ArrayList<Integer> selectedButtons = new ArrayList<Integer>();
             delayTimer.stop();
             delayTimer.setDelay(myrand.nextInt(RAND_RANGE_TIME) + 3000);
 
             for (int i = 0; i <= myrand.nextInt(RAND_RANGE_FOR); i++) {
-
                 selectedButtons.add(myrand.nextInt(RAND_RANGE_BTN));
-
-                //selectedButtons[0] = myrand.nextInt(RAND_RANGE_BTN);
-
             }
-
 
             for(Iterator<Connection> c = connections.iterator(); c.hasNext(); ) {
                 Connection connection = c.next();
@@ -84,9 +105,7 @@ public class Server {
                     Integer selectedButton = i.next();
                     connection.sendMessage(String.valueOf(selectedButton));
                 }
-                System.out.println(connection);
             }
-
             buttonStartTime = System.currentTimeMillis();
         }
     });
