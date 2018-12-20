@@ -6,32 +6,49 @@ import java.awt.event.ActionListener;
 public class GUIChatClient extends JFrame {
 
 
-    private JTextArea messageTextArea = new JTextArea();
+    private JTextArea messageTextArea = new JTextArea(1,15);
     private JLabel timeLabel = new JLabel();
-    private Timer delayTimer;
-
     JButton[] buttons = new JButton[16];
-    JPanel buttonsPanel = new JPanel();
-    JButton btn_start = new JButton("Start");
-
+    JPanel buttonPanel = new JPanel();
+    JButton buttonStart = new JButton("Start");
+    JPanel southPanel = new JPanel(new BorderLayout());
+    JPanel timePanel = new JPanel(new BorderLayout());
+    JPanel mainPanel = new JPanel(new GridLayout(1,2));
+    JPanel userPanel = new JPanel(new BorderLayout());
+    private JTextField sendArea = new JTextField();
+    private JButton buttonSend = new JButton("Send");
     private boolean started = false;
-    private String Message;
-
-    Client chatClient;
+    private String message;
+    Client client;
+    //private Timer delayTimer;
 
     public GUIChatClient() throws HeadlessException {
         setLayout(new BorderLayout());
         setTitle("GUI Chat");
-        setSize(300, 300);
+        setSize(900, 600);
 
-        this.add(buttonsPanel, BorderLayout.CENTER);
+        southPanel.add(buttonStart,BorderLayout.EAST);
+        southPanel.add(messageTextArea, BorderLayout.CENTER);
+        southPanel.add(timeLabel,BorderLayout.WEST);
 
-        JPanel SouthPanel = new JPanel(new BorderLayout());
-        SouthPanel.add(btn_start,BorderLayout.EAST);
-        SouthPanel.add(timeLabel,BorderLayout.WEST);
-        this.add(SouthPanel,BorderLayout.SOUTH);
+        mainPanel.add(buttonPanel);
+        mainPanel.add(timePanel);
 
-        buttonsPanel.setLayout(new GridLayout(4, 4));
+        userPanel.add(sendArea, BorderLayout.CENTER);
+        userPanel.add(buttonSend, BorderLayout.EAST);
+
+        timePanel.add(new JScrollPane(messageTextArea), BorderLayout.CENTER);
+        timePanel.add(userPanel, BorderLayout.SOUTH);
+
+        this.add(mainPanel, BorderLayout.CENTER);
+        this.add(southPanel,BorderLayout.SOUTH);
+        this.add(timePanel, BorderLayout.EAST);
+
+        messageTextArea.setEditable(false);
+
+        buttonPanel.setLayout(new GridLayout(4, 4));
+
+
 
         ActionListener ButtonListener = new ActionListener() {
 
@@ -43,9 +60,9 @@ public class GUIChatClient extends JFrame {
                     button.setBackground(Color.GRAY);
                 }
                 if (checkButtons()) {
-                    btn_start.setEnabled(true);
+                    buttonStart.setEnabled(true);
                     started = false;
-                    chatClient.sendMessage("done");
+                    client.sendMessage("done");
                 }
 
             }
@@ -54,46 +71,63 @@ public class GUIChatClient extends JFrame {
         int i = 0;
         for (JButton button : buttons) {
             buttons[i] = new JButton();
-            buttonsPanel.add(buttons[i]);
+            buttonPanel.add(buttons[i]);
             buttons[i].setBackground(Color.GRAY);
             buttons[i].setEnabled(false);
             buttons[i].addActionListener(ButtonListener);
             i++;
         }
-        btn_start.addActionListener(new ActionListener() {
+
+        buttonStart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 if (!started) {
                     started = true;
-                    chatClient.sendMessage("start");
-                    btn_start.setEnabled(false);
+                    client.sendMessage("start");
+                    buttonStart.setEnabled(false);
                 }
             }
         });
 
 
-        chatClient = new Client("localhost", 1234);
+        client = new Client("localhost", 1234);
 
         ActionListener receiveListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                Message = actionEvent.getActionCommand();
-                System.out.println("Neue Nachricht empfangen: " + actionEvent.getActionCommand());
-                if (Integer.parseInt(actionEvent.getActionCommand()) > 16) {
-                    timeLabel.setText(actionEvent.getActionCommand()+"ms");
-                } else {
-                    if (!buttons[Integer.parseInt(actionEvent.getActionCommand())].isEnabled()) {
-                        buttons[Integer.parseInt(actionEvent.getActionCommand())].setEnabled(true);
-                        buttons[Integer.parseInt(actionEvent.getActionCommand())].setBackground(Color.GREEN);
-                        btn_start.setEnabled(false);
-                    }
+                message = actionEvent.getActionCommand();
 
+                if(actionEvent.getID() == 1) {
+                    int selectedButton = Integer.parseInt(message);
+
+                    if (!buttons[selectedButton].isEnabled()) {
+                        buttons[selectedButton].setEnabled(true);
+                        buttons[selectedButton].setBackground(Color.GREEN);
+                        buttonStart.setEnabled(false);
+                    }
+                }
+
+                if(actionEvent.getID() == 0) {
+                    System.out.println("Neue Nachricht empfangen: " +message);
+                    timeLabel.setText("Deine Zeit: " +message + "ms\n");
+                    messageTextArea.append(message + "ms\n");
                 }
             }
         };
 
-        chatClient.addActionListener(receiveListener);
-        chatClient.start();
+        ActionListener sendListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                client.sendMessage(getMessage());
+                sendArea.setText("");
+            }
+        };
+
+        sendArea.addActionListener(sendListener);
+        buttonSend.addActionListener(sendListener);
+
+        client.addActionListener(receiveListener);
+        client.start();
         setVisible(true);
     }
 
@@ -112,6 +146,9 @@ public class GUIChatClient extends JFrame {
         return (status);
     }
 
+    private String getMessage() {
+        return sendArea.getText();
+    }
 
     public static void main(String[] args) {
         GUIChatClient guiChatClient = new GUIChatClient();

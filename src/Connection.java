@@ -55,8 +55,25 @@ public class Connection {
                         // Receive messages from the other side
                         String message = receive.readUTF();
 
+
+                        /*if (username.length() <= 0) {
+                            username = message;
+                        } else {
                             // Send message to all Listeners
                             notifyListeners(message);
+                        }*/
+                        // Send message to all Listeners
+                        if(message.equals("start") || message.equals("done")) {
+                            sendServerCommand(message);
+                        }
+                        else if (Integer.parseInt(message) >= 0 && Integer.parseInt(message) <=15 ) {
+                            sendSelected(message);
+                        }
+                        else {
+                            sendTime(message);
+                        }
+
+                        // notifyListeners(message);
 
                     } catch (IOException e) {
                         Connection.this.stop();
@@ -112,6 +129,29 @@ public class Connection {
         } catch (IOException e) {
             Connection.this.stop();
             Connection.this.close();
+        }
+    }
+
+    /**
+     * send selected buttons to other client
+     *
+     * @param selectedButton
+     */
+    public void sendSelected(String selectedButton) {
+        for (ActionListener l : listeners) {
+            l.actionPerformed(new ActionEvent(this, 1, selectedButton));
+        }
+    }
+
+    public void sendServerCommand(String command) {
+        for (ActionListener l : listeners) {
+            l.actionPerformed(new ActionEvent(this, 2, command));
+        }
+    }
+
+    public void sendTime(String time) {
+        for (ActionListener l : listeners) {
+            l.actionPerformed(new ActionEvent(this, 0, time));
         }
     }
 

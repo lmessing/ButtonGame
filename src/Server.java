@@ -2,8 +2,11 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.ServerSocket;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 public class Server {
@@ -16,6 +19,7 @@ public class Server {
     private Random myrand = new Random();
 
     long buttonStartTime, buttonStopTime;
+    private boolean running = false;
 
     private int port;
     private ArrayList<Connection> connections = new ArrayList<>();
@@ -26,15 +30,30 @@ public class Server {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            switch (e.getActionCommand()){
-                case "start": delayTimer.start();
-                break;
-                case "done":
-                    buttonStopTime = System.currentTimeMillis();
-                    long elapsedTime = (buttonStopTime - buttonStartTime);
-                    Connection c = (Connection)e.getSource();
-                    c.sendMessage(Long.toString(elapsedTime));
-                    break;
+           /* for (Connection c : connections) {
+                c.sendMessage(((Connection) e.getSource()).getUsername() + ": " + e.getActionCommand());
+            }*/
+
+            if(e.getID() == 2 ){
+                switch (e.getActionCommand()){
+                    case "start":
+                        delayTimer.start();
+                        break;
+
+                    case "done":
+                        buttonStopTime = System.currentTimeMillis();
+                        long elapsedTime = (buttonStopTime - buttonStartTime);
+                        Connection c = (Connection)e.getSource();
+                        c.sendMessage(Long.toString(elapsedTime));
+                        break;
+                }
+            }
+
+            if (e.getID() == 0) {
+                for (Connection c : connections) {
+                    c.sendMessage(((Connection) e.getSource()).getUsername() + ": " + e.getActionCommand());
+                }
+
             }
 
         }
@@ -44,19 +63,34 @@ public class Server {
     public Timer delayTimer = new Timer(myrand.nextInt(RAND_RANGE_TIME) + 3000, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
+            //int[] selectedButtons = new int[2];
+            ArrayList<Integer> selectedButtons = new ArrayList<Integer>();
             delayTimer.stop();
             delayTimer.setDelay(myrand.nextInt(RAND_RANGE_TIME) + 3000);
-            for (Connection c : connections) {
-                for (int i = 0; i <= myrand.nextInt(RAND_RANGE_FOR); i++) {
-                    c.sendMessage(Integer.toString(myrand.nextInt(RAND_RANGE_BTN)));
-                }
+
+            for (int i = 0; i <= myrand.nextInt(RAND_RANGE_FOR); i++) {
+
+                selectedButtons.add(myrand.nextInt(RAND_RANGE_BTN));
+
+                //selectedButtons[0] = myrand.nextInt(RAND_RANGE_BTN);
+
             }
+
+
+            for(Iterator<Connection> c = connections.iterator(); c.hasNext(); ) {
+                Connection connection = c.next();
+
+                for(Iterator<Integer> i = selectedButtons.iterator(); i.hasNext();){
+                    Integer selectedButton = i.next();
+                    connection.sendMessage(String.valueOf(selectedButton));
+                }
+                System.out.println(connection);
+            }
+
             buttonStartTime = System.currentTimeMillis();
         }
     });
 
-
-    private boolean running = false;
 
     public Server(int port) {
         this.port = port;
