@@ -1,7 +1,12 @@
 import javax.swing.*;
+import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.text.ParseException;
+import java.util.Hashtable;
 
 public class GUIChatClient extends JFrame {
 
@@ -14,31 +19,25 @@ public class GUIChatClient extends JFrame {
     JPanel southPanel = new JPanel(new BorderLayout());
     JPanel timePanel = new JPanel(new BorderLayout());
     JPanel mainPanel = new JPanel(new GridLayout(1,2));
-    JPanel userPanel = new JPanel(new BorderLayout());
-    private JTextField sendArea = new JTextField();
-    private JButton buttonSend = new JButton("Send");
+    JPanel userPanel = new JPanel(new FlowLayout());
     private boolean started = false;
     private String message;
     Client client;
-    //private Timer delayTimer;
 
     public GUIChatClient() throws HeadlessException {
         setLayout(new BorderLayout());
         setTitle("GUI Chat");
-        setSize(900, 600);
+        setSize(600, 400);
+
 
         southPanel.add(buttonStart,BorderLayout.EAST);
-        southPanel.add(messageTextArea, BorderLayout.CENTER);
+      //  southPanel.add(messageTextArea, BorderLayout.CENTER);
         southPanel.add(timeLabel,BorderLayout.WEST);
 
         mainPanel.add(buttonPanel);
         mainPanel.add(timePanel);
 
-        userPanel.add(sendArea, BorderLayout.CENTER);
-        userPanel.add(buttonSend, BorderLayout.EAST);
-
         timePanel.add(new JScrollPane(messageTextArea), BorderLayout.CENTER);
-        timePanel.add(userPanel, BorderLayout.SOUTH);
 
         this.add(mainPanel, BorderLayout.CENTER);
         this.add(southPanel,BorderLayout.SOUTH);
@@ -85,6 +84,7 @@ public class GUIChatClient extends JFrame {
                     started = true;
                     client.sendMessage("start");
                     buttonStart.setEnabled(false);
+
                 }
             }
         });
@@ -115,17 +115,6 @@ public class GUIChatClient extends JFrame {
             }
         };
 
-        ActionListener sendListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                client.sendMessage(getMessage());
-                sendArea.setText("");
-            }
-        };
-
-        sendArea.addActionListener(sendListener);
-        buttonSend.addActionListener(sendListener);
-
         client.addActionListener(receiveListener);
         client.start();
         setVisible(true);
@@ -146,9 +135,7 @@ public class GUIChatClient extends JFrame {
         return (status);
     }
 
-    private String getMessage() {
-        return sendArea.getText();
-    }
+
 
     public static void main(String[] args) {
         GUIChatClient guiChatClient = new GUIChatClient();
